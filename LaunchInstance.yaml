@@ -1,0 +1,32 @@
+heat_template_version: 2014-10-16
+	
+description: This is first template for spinning a VM
+
+resources:
+  server1:
+    type: OS::Nova::Server
+    properties:
+      flavor: test-flavor
+      key_name: root-on-osp
+      image: rhel7.2
+      networks:
+        - port: { get_resource: server1_port }
+
+
+  server1_port:
+    type: OS::Neutron::Port
+    properties:
+      network: private
+      security_groups: 
+        - default
+
+  server1_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: public
+
+  server1_floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: server1_floating_ip }
+      port_id: { get_resource: server1_port }
